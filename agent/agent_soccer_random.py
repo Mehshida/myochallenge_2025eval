@@ -9,6 +9,7 @@ import evaluation_pb2
 import evaluation_pb2_grpc
 import grpc
 import gymnasium as gym
+from stable_baselines3 import PPO
 
 def pack_for_grpc(entity):
     return pickle.dumps(entity)
@@ -42,11 +43,14 @@ class EnvShell:
 
 class Policy:
 
-    def __init__(self, env):
+    def __init__(self, env, model_path="ppo_myo_soccer.zip"):
         self.action_space = env.action_space
+        self.model = PPO.load(model_path)
+        print(f"Loaded PPO policy from {model_path}")
 
-    def __call__(self, env):
-        return self.action_space.sample()
+    def __call__(self, obs):
+        action, _states = self.model.predict(obs, deterministic=True)
+        return action
 
 custom_obs_keys = [      
     'internal_qpos',
@@ -108,7 +112,7 @@ while not flat_completed:
             f"Trial: {trial}, Iteration: {counter} flag_trial: {flag_trial} flat_completed: {flat_completed}"
         )
 
-        action = env_shell.action_space.sample()
+        action = policy(obs)
         base = unpack_for_grpc(
             stub.act_on_environment(
                 evaluation_pb2.Package(SerializedEntity=pack_for_grpc(action))
