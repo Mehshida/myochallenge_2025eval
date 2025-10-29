@@ -97,12 +97,16 @@ while not flat_completed:
     ret = 0
 
     print(f"LOCO-SOCCER: Start Resetting the environment and get 1st obs of iter {trial}")
-    
+
     obs = unpack_for_grpc(
         stub.reset(
             evaluation_pb2.Package(SerializedEntity=pack_for_grpc(None))
         ).SerializedEntity
     )
+
+    # Handle new Gymnasium API that returns (obs, info) tuple
+    if isinstance(obs, tuple):
+        obs = obs[0]
 
     counter = 0
 
