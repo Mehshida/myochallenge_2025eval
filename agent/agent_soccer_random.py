@@ -52,19 +52,18 @@ class Policy:
         action, _states = self.model.predict(obs, deterministic=True)
         return action
 
-custom_obs_keys = [      
+custom_obs_keys = [
     'internal_qpos',
     'internal_qvel',
     'grf',
     'torso_angle',
-    'pelvis_angle',
+    'ball_pos',
     'model_root_pos',
     'model_root_vel',
     'muscle_length',
     'muscle_velocity',
     'muscle_force',
-    'ball_pos',
-    'goal_bounds',
+    'act',
 ]
 
 
